@@ -10,12 +10,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_osm_plugin: ^0.70.4
-
-
   cupertino_icons: ^1.0.2
   google_maps_flutter: ^2.5.3
+  uuid: ^4.3.2
+  html: ^0.15.4
   location: ^5.0.3
+  google_places_flutter: ^2.0.8
+  permission_handler: ^11.3.0
+  geocoding: ^2.1.1
+  loading_animation_widget: ^1.2.0+4
+  flutter_polyline_points: ^2.0.0
+
 
 dev_dependencies:
   flutter_test:

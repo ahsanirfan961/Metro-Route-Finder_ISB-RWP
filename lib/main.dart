@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:metro_route_finder/home_page.dart';
 
@@ -95,12 +97,17 @@ class WelcomePage extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    );
+                    Timer(const Duration(milliseconds: 300), () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                      );
+                    });
                   },
                   splashColor: Colors.orange.withOpacity(0.3),
+                  splashFactory: InkRipple.splashFactory,
                   borderRadius: BorderRadius.circular(25),
                   child: const Center(
                       child: Text(
