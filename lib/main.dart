@@ -98,7 +98,7 @@ class WelcomePage extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     Timer(const Duration(milliseconds: 300), () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const HomePage(),
@@ -106,8 +106,8 @@ class WelcomePage extends StatelessWidget {
                       );
                     });
                   },
-                  splashColor: Colors.orange.withOpacity(0.3),
                   splashFactory: InkRipple.splashFactory,
+                  splashColor: Colors.orange.shade700,
                   borderRadius: BorderRadius.circular(25),
                   child: const Center(
                       child: Text(

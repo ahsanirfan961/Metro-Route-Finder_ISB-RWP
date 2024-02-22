@@ -3,7 +3,6 @@ import 'package:metro_route_finder/bottom_sheet.dart';
 import 'package:metro_route_finder/map.dart';
 import 'package:metro_route_finder/nav_bar.dart';
 
-BuildContext? homeContext;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,7 +22,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    homeContext = context;
     return Scaffold(
       drawer: const NavBar(),
       appBar: AppBar(
