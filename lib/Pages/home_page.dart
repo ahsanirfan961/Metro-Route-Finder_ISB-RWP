@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:metro_route_finder/bottom_sheet.dart';
-import 'package:metro_route_finder/map.dart';
-import 'package:metro_route_finder/nav_bar.dart';
+import 'package:metro_route_finder/Widgets/bottom_sheet.dart';
+import 'package:metro_route_finder/Widgets/map.dart';
+import 'package:metro_route_finder/functions.dart';
+import 'package:metro_route_finder/Widgets/nav_bar.dart';
 
 
 class HomePage extends StatefulWidget {
