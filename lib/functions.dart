@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -82,5 +84,10 @@ Future<BitmapDescriptor> getCustomIcon(String imagePath) async {
         iconPath = 'assets/images/bus_stop.png';
       }
     }
+  }
+
+  double distanceBetweenPoints(LatLng source, LatLng dest)
+  {
+    return sqrt(pow(source.latitude - dest.latitude, 2) + pow(source.longitude - dest.longitude, 2));
   }
   

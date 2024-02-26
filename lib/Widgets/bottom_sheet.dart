@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -90,7 +92,9 @@ class _MainBottomSheetState extends State<MainBottomSheet>
                                   markerId: const MarkerId('source'),
                                   position: source.position!,
                                   icon: await getCustomIcon(
-                                      'assets/images/bus_stop_start.png')));
+                                      'assets/images/bus_stop_start.png'),
+                                  infoWindow: const InfoWindow(
+                                      title: 'Starting Location')));
                             } else if (index == 1) {
                               destination.address = searchLocation.address;
                               destination.position = searchLocation.position;
@@ -98,7 +102,9 @@ class _MainBottomSheetState extends State<MainBottomSheet>
                                   markerId: const MarkerId('destination'),
                                   position: destination.position!,
                                   icon: await getCustomIcon(
-                                      'assets/images/bus_stop_end.png')));
+                                      'assets/images/bus_stop_end.png'),
+                                  infoWindow:
+                                      const InfoWindow(title: 'Destination')));
                             }
                             setState(() {});
                           }
@@ -115,7 +121,23 @@ class _MainBottomSheetState extends State<MainBottomSheet>
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
-                onPressed: () async {},
+                onPressed: () async {
+                  if (source.position != null && destination.position != null) {
+                    var startStation = stationPositions.keys.first;
+                    var disFromStartStation = distanceBetweenPoints(
+                        source.position!, stationPositions[startStation]);
+                    for (var stationName in stationPositions.keys) {
+                      var distance = distanceBetweenPoints(
+                          stationPositions[stationName], source.position!);
+                      if (distance < disFromStartStation) {
+                        disFromStartStation = distance;
+                        startStation = stationName;
+                      }
+                    }
+                    ScaffoldMessenger.of(context as BuildContext)
+                        .showSnackBar(SnackBar(content: Text(startStation)));
+                  }
+                },
                 style: const ButtonStyle(
                     backgroundColor:
                         MaterialStatePropertyAll(Colors.deepOrangeAccent),
