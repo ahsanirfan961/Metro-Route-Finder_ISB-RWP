@@ -88,23 +88,29 @@ class _MainBottomSheetState extends State<MainBottomSheet>
                             if (index == 0) {
                               source.address = searchLocation.address;
                               source.position = searchLocation.position;
-                              MapMarkers().addMarker(Marker(
+                              MapDataState().addFixedMarker(Marker(
                                   markerId: const MarkerId('source'),
                                   position: source.position!,
                                   icon: await getCustomIcon(
                                       'assets/images/bus_stop_start.png'),
                                   infoWindow: const InfoWindow(
                                       title: 'Starting Location')));
+                              MapWidgetState()
+                                  .animateCameraTo(source.position!);
+                              MapDataState().clearRoute();
                             } else if (index == 1) {
                               destination.address = searchLocation.address;
                               destination.position = searchLocation.position;
-                              MapMarkers().addMarker(Marker(
+                              MapDataState().addFixedMarker(Marker(
                                   markerId: const MarkerId('destination'),
                                   position: destination.position!,
                                   icon: await getCustomIcon(
                                       'assets/images/bus_stop_end.png'),
                                   infoWindow:
                                       const InfoWindow(title: 'Destination')));
+                              MapWidgetState()
+                                  .animateCameraTo(destination.position!);
+                              MapDataState().clearRoute();
                             }
                             setState(() {});
                           }
@@ -123,19 +129,69 @@ class _MainBottomSheetState extends State<MainBottomSheet>
               child: ElevatedButton(
                 onPressed: () async {
                   if (source.position != null && destination.position != null) {
-                    var startStation = stationPositions.keys.first;
-                    var disFromStartStation = distanceBetweenPoints(
-                        source.position!, stationPositions[startStation]);
-                    for (var stationName in stationPositions.keys) {
-                      var distance = distanceBetweenPoints(
-                          stationPositions[stationName], source.position!);
-                      if (distance < disFromStartStation) {
-                        disFromStartStation = distance;
-                        startStation = stationName;
-                      }
+                    var startStation = getNearestStationTo(source.position!);
+                    var destStation =
+                        getNearestStationTo(destination.position!);
+
+                    /*checking that if the distance between the source location 
+                      and destination location is not actually less than the 
+                      distance that the traveller needs to cover to reach the 
+                      metro station*/
+                    var absDistance = calculateDistanceBetweenLocations(
+                        await getPolylineCoordinates(
+                            source.position!, destination.position!));
+
+                    var metroDistance = calculateDistanceBetweenLocations(
+                            await getPolylineCoordinates(source.position!,
+                                stationPositions[startStation])) +
+                        calculateDistanceBetweenLocations(
+                            await getPolylineCoordinates(destination.position!,
+                                stationPositions[destStation]));
+
+                    if (absDistance <= 0.5 * metroDistance) {
+                      MapDataState().addPolyline('route', source.position!,
+                          destination.position!, Colors.blue);
+                      ScaffoldMessenger.of(context as BuildContext)
+                          .showSnackBar(const SnackBar(
+                              content: Text(
+                                  'No Metro Route exists between these locations!')));
+                      return;
                     }
-                    ScaffoldMessenger.of(context as BuildContext)
-                        .showSnackBar(SnackBar(content: Text(startStation)));
+
+                    // creating route to start station
+                    MapDataState()
+                        .addRouteMarker(getStationMarker(startStation));
+                    MapDataState().addPolyline('source', source.position!,
+                        stationPositions[startStation], Colors.blue);
+
+                    // creating route to destination station
+                    MapDataState()
+                        .addRouteMarker(getStationMarker(destStation));
+                    MapDataState().addPolyline(
+                        'destination',
+                        destination.position!,
+                        stationPositions[destStation],
+                        Colors.blue);
+
+                    // creating route between metro stations
+                    var stationLayout = StationLayout();
+                    var route =
+                        stationLayout.pathBetween(startStation, destStation);
+                    for (int i = 0; i < route.length - 1; i++) {
+                      Color color = stationColors[route[i]] ??
+                          stationColors[route[i + 1]];
+                      MapDataState().addRouteMarker(getStationMarker(route[i]));
+                      MapDataState().addCustomPolyline(Polyline(
+                          polylineId: PolylineId("${route[i]}+${route[i + 1]}"),
+                          color: color,
+                          points: [
+                            stationPositions[route[i]],
+                            stationPositions[route[i + 1]]
+                          ],
+                          width: POLYLINE_WIDTH,
+                          startCap: Cap.roundCap,
+                          endCap: Cap.roundCap));
+                    }
                   }
                 },
                 style: const ButtonStyle(
