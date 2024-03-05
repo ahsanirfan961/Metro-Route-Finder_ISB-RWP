@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:metro_route_finder/Pages/welcome_page.dart';
+import 'package:metro_route_finder/dependency_injection.dart';
 
 void main() {
   runApp(const App());
+  DependencyInjection.init();
 }
 
 class App extends StatelessWidget {
@@ -11,7 +14,7 @@ class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Metro Route Finder',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -22,5 +25,3 @@ class App extends StatelessWidget {
     );
   }
 }
-
-

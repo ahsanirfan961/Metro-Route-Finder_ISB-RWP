@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -128,70 +126,94 @@ class _MainBottomSheetState extends State<MainBottomSheet>
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
                 onPressed: () async {
-                  if (source.position != null && destination.position != null) {
-                    var startStation = getNearestStationTo(source.position!);
-                    var destStation =
-                        getNearestStationTo(destination.position!);
+                  try {
+                    if (source.position != null &&
+                        destination.position != null) {
+                      var startStation = getNearestStationTo(source.position!);
+                      var destStation =
+                          getNearestStationTo(destination.position!);
 
-                    /*checking that if the distance between the source location 
+                      /*checking that if the distance between the source location 
                       and destination location is not actually less than the 
                       distance that the traveller needs to cover to reach the 
                       metro station*/
-                    var absDistance = calculateDistanceBetweenLocations(
-                        await getPolylineCoordinates(
-                            source.position!, destination.position!));
+                      var absDistance = calculateDistanceBetweenLocations(
+                          await getPolylineCoordinates(
+                              source.position!, destination.position!));
 
-                    var metroDistance = calculateDistanceBetweenLocations(
-                            await getPolylineCoordinates(source.position!,
-                                stationPositions[startStation])) +
-                        calculateDistanceBetweenLocations(
-                            await getPolylineCoordinates(destination.position!,
-                                stationPositions[destStation]));
+                      var metroDistance = calculateDistanceBetweenLocations(
+                              await getPolylineCoordinates(source.position!,
+                                  stationPositions[startStation])) +
+                          calculateDistanceBetweenLocations(
+                              await getPolylineCoordinates(
+                                  destination.position!,
+                                  stationPositions[destStation]));
 
-                    if (absDistance <= 0.5 * metroDistance) {
-                      MapDataState().addPolyline('route', source.position!,
-                          destination.position!, Colors.blue);
-                      ScaffoldMessenger.of(context as BuildContext)
-                          .showSnackBar(const SnackBar(
-                              content: Text(
-                                  'No Metro Route exists between these locations!')));
-                      return;
+                      if (absDistance <= 0.5 * metroDistance) {
+                        MapDataState().addPolyline('route', source.position!,
+                            destination.position!, Colors.blue);
+                        ScaffoldMessenger.of(context as BuildContext)
+                            .showSnackBar(const SnackBar(
+                                content: Text(
+                                    'No Metro Route exists between these locations!')));
+                        return;
+                      }
+
+                      // creating route to start station
+                      MapDataState()
+                          .addRouteMarker(getStationMarker(startStation));
+                      MapDataState().addPolyline('source', source.position!,
+                          stationPositions[startStation], Colors.blue);
+
+                      // creating route to destination station
+                      MapDataState()
+                          .addRouteMarker(getStationMarker(destStation));
+                      MapDataState().addPolyline(
+                          'destination',
+                          destination.position!,
+                          stationPositions[destStation],
+                          Colors.blue);
+
+                      // creating route between metro stations
+                      var stationLayout = StationLayout();
+                      var route =
+                          stationLayout.pathBetween(startStation, destStation);
+                      for (int i = 0; i < route.length - 1; i++) {
+                        Color color = stationColors[route[i]] ??
+                            stationColors[route[i + 1]];
+                        MapDataState()
+                            .addRouteMarker(getStationMarker(route[i]));
+                        MapDataState().addCustomPolyline(Polyline(
+                            polylineId:
+                                PolylineId("${route[i]}+${route[i + 1]}"),
+                            color: color,
+                            points: [
+                              stationPositions[route[i]],
+                              stationPositions[route[i + 1]]
+                            ],
+                            width: POLYLINE_WIDTH,
+                            startCap: Cap.roundCap,
+                            endCap: Cap.roundCap));
+                      }
                     }
-
-                    // creating route to start station
-                    MapDataState()
-                        .addRouteMarker(getStationMarker(startStation));
-                    MapDataState().addPolyline('source', source.position!,
-                        stationPositions[startStation], Colors.blue);
-
-                    // creating route to destination station
-                    MapDataState()
-                        .addRouteMarker(getStationMarker(destStation));
-                    MapDataState().addPolyline(
-                        'destination',
-                        destination.position!,
-                        stationPositions[destStation],
-                        Colors.blue);
-
-                    // creating route between metro stations
-                    var stationLayout = StationLayout();
-                    var route =
-                        stationLayout.pathBetween(startStation, destStation);
-                    for (int i = 0; i < route.length - 1; i++) {
-                      Color color = stationColors[route[i]] ??
-                          stationColors[route[i + 1]];
-                      MapDataState().addRouteMarker(getStationMarker(route[i]));
-                      MapDataState().addCustomPolyline(Polyline(
-                          polylineId: PolylineId("${route[i]}+${route[i + 1]}"),
-                          color: color,
-                          points: [
-                            stationPositions[route[i]],
-                            stationPositions[route[i + 1]]
-                          ],
-                          width: POLYLINE_WIDTH,
-                          startCap: Cap.roundCap,
-                          endCap: Cap.roundCap));
-                    }
+                  } catch (e) {
+                    showDialog(
+                        context: context as BuildContext,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Connection Error!'),
+                            content: const Text(
+                                'Please check your internet connection and try again later'),
+                            icon: const Icon(Icons.error, size: 50),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'))
+                            ],
+                          );
+                        });
                   }
                 },
                 style: const ButtonStyle(
@@ -259,20 +281,40 @@ class SearchBottomSheet extends StatelessWidget {
                 child: InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(100)),
                     onTap: () async {
-                      if (await locationPermission(context)) {
-                        if (await gpsEnabled()) {
-                          var currentLocation = await getCurrentLocation();
-                          List<Placemark> placemarks =
-                              await placemarkFromCoordinates(
-                                  currentLocation.latitude!,
-                                  currentLocation.longitude!);
-                          searchLocation.position = LatLng(
-                              currentLocation.latitude!,
-                              currentLocation.longitude!);
-                          searchLocation.address =
-                              "${placemarks[0].street}, ${placemarks[0].subLocality}";
-                          Navigator.pop(context, searchLocation);
+                      try {
+                        if (await locationPermission(context)) {
+                          if (await gpsEnabled()) {
+                            var currentLocation = await getCurrentLocation();
+                            List<Placemark> placemarks =
+                                await placemarkFromCoordinates(
+                                    currentLocation.latitude!,
+                                    currentLocation.longitude!);
+                            searchLocation.position = LatLng(
+                                currentLocation.latitude!,
+                                currentLocation.longitude!);
+                            searchLocation.address =
+                                "${placemarks[0].street}, ${placemarks[0].subLocality}";
+                            Navigator.pop(context, searchLocation);
+                          }
                         }
+                      } catch (e) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Connection Error!'),
+                                content: const Text(
+                                    'Please check your internet connection and try again later'),
+                                icon: const Icon(Icons.error, size: 50),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              );
+                            });
                       }
                     },
                     child: const Icon(Icons.location_searching_rounded)),
