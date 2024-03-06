@@ -159,3 +159,23 @@ double calculateDistanceBetweenLocations(List<LatLng> points) {
   }
   return totalDistance;
 }
+
+void showConnectionError(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Connection Error!'),
+          content: const Text(
+              'Please check your internet connection and try again later'),
+          icon: const Icon(Icons.error, size: 50),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'))
+          ],
+        );
+      });
+}

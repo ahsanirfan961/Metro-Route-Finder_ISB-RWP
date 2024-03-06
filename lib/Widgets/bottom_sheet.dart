@@ -7,6 +7,8 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:metro_route_finder/const.dart';
 import 'package:metro_route_finder/Widgets/map.dart';
+import 'package:metro_route_finder/controllers/map_data.dart';
+import 'package:metro_route_finder/controllers/station.dart';
 import 'package:metro_route_finder/functions.dart';
 
 class MapLocation {
@@ -197,23 +199,7 @@ class _MainBottomSheetState extends State<MainBottomSheet>
                       }
                     }
                   } catch (e) {
-                    showDialog(
-                        context: context as BuildContext,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Connection Error!'),
-                            content: const Text(
-                                'Please check your internet connection and try again later'),
-                            icon: const Icon(Icons.error, size: 50),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'))
-                            ],
-                          );
-                        });
+                    showConnectionError(context as BuildContext);
                   }
                 },
                 style: const ButtonStyle(
@@ -298,23 +284,7 @@ class SearchBottomSheet extends StatelessWidget {
                           }
                         }
                       } catch (e) {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Connection Error!'),
-                                content: const Text(
-                                    'Please check your internet connection and try again later'),
-                                icon: const Icon(Icons.error, size: 50),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              );
-                            });
+                        showConnectionError(context);
                       }
                     },
                     child: const Icon(Icons.location_searching_rounded)),
