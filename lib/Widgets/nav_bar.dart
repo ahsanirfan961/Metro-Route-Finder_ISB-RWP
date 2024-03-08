@@ -11,15 +11,54 @@ class NavBar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const UserAccountsDrawerHeader(
-            currentAccountPicture: CircleAvatar(
-                child: Image(image: AssetImage('assets/images/metro.png'))),
-            accountName: Text('Metro Route FInder'),
-            accountEmail: Text('-by Muhammad Ahsan'),
-            decoration: BoxDecoration(
-              color: Colors.deepOrange,
+          Stack(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              const SizedBox(
+                height: 155,
+                child: Image(
+                  image: AssetImage('assets/images/orange_material.jpg'),
+                  // height: 100,
+                ),
+                // decoration: const BoxDecoration(color: Color(0xFFFF6E40)),
+              ),
+              Container(
+                height: 150,
+              )
+            ]),
+            const Positioned(
+              left: 95,
+              top: 90,
+              child: CircleAvatar(
+                  backgroundColor: Color(0xFFFAF0F1),
+                  radius: 60,
+                  child: Image(
+                    image: AssetImage('assets/images/logo.png'),
+                    width: 110,
+                    height: 110,
+                  )),
             ),
-          ),
+            const Positioned(
+                top: 220,
+                left: 35,
+                child: Text(
+                  'Metro Route Finder',
+                  style: TextStyle(fontSize: 24, color: Colors.black87),
+                )),
+            const Positioned(
+                top: 250,
+                left: 100,
+                child: Text(
+                  'Islamabad',
+                  style: TextStyle(fontSize: 20, color: Colors.black87),
+                )),
+            const Positioned(
+                top: 275,
+                left: 135,
+                child: Text(
+                  'v1.01',
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ))
+          ]),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),

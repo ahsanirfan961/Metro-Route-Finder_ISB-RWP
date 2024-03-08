@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:metro_route_finder/Widgets/loading.dart';
 import 'package:metro_route_finder/const.dart';
 import 'package:metro_route_finder/controllers/map_data.dart';
 import 'package:metro_route_finder/functions.dart';
@@ -32,6 +33,13 @@ class MapWidgetState extends State<MapWidget> {
   factory MapWidgetState() {
     return _mapState;
   }
+  @override
+  void initState() {
+    super.initState();
+    Timer(const Duration(seconds: 1), () {
+      LoadingWidget.of(context).startLoading();
+    });
+  }
 
   Future<void> animateCameraTo(LatLng position) async {
     GoogleMapController controller = await _mapController.future;
@@ -58,11 +66,12 @@ class MapWidgetState extends State<MapWidget> {
                   _mapController.complete(controller);
                   await setStationMarkers();
                   _mapCreated = true;
+                  LoadingWidget.of(context).stopLoading();
                   setState(() {});
                 },
               );
             }),
-        getLoading(),
+        LoadingWidget.of(context).loadingWidget,
         getStationButton()
       ],
     );

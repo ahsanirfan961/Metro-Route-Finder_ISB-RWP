@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
+import 'package:metro_route_finder/Widgets/loading.dart';
 import 'package:metro_route_finder/const.dart';
 import 'package:metro_route_finder/Widgets/map.dart';
 import 'package:metro_route_finder/controllers/map_data.dart';
@@ -128,79 +129,9 @@ class _MainBottomSheetState extends State<MainBottomSheet>
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
                 onPressed: () async {
-                  try {
-                    if (source.position != null &&
-                        destination.position != null) {
-                      var startStation = getNearestStationTo(source.position!);
-                      var destStation =
-                          getNearestStationTo(destination.position!);
-
-                      /*checking that if the distance between the source location 
-                      and destination location is not actually less than the 
-                      distance that the traveller needs to cover to reach the 
-                      metro station*/
-                      var absDistance = calculateDistanceBetweenLocations(
-                          await getPolylineCoordinates(
-                              source.position!, destination.position!));
-
-                      var metroDistance = calculateDistanceBetweenLocations(
-                              await getPolylineCoordinates(source.position!,
-                                  stationPositions[startStation])) +
-                          calculateDistanceBetweenLocations(
-                              await getPolylineCoordinates(
-                                  destination.position!,
-                                  stationPositions[destStation]));
-
-                      if (absDistance <= 0.5 * metroDistance) {
-                        MapDataState().addPolyline('route', source.position!,
-                            destination.position!, Colors.blue);
-                        ScaffoldMessenger.of(context as BuildContext)
-                            .showSnackBar(const SnackBar(
-                                content: Text(
-                                    'No Metro Route exists between these locations!')));
-                        return;
-                      }
-
-                      // creating route to start station
-                      MapDataState()
-                          .addRouteMarker(getStationMarker(startStation));
-                      MapDataState().addPolyline('source', source.position!,
-                          stationPositions[startStation], Colors.blue);
-
-                      // creating route to destination station
-                      MapDataState()
-                          .addRouteMarker(getStationMarker(destStation));
-                      MapDataState().addPolyline(
-                          'destination',
-                          destination.position!,
-                          stationPositions[destStation],
-                          Colors.blue);
-
-                      // creating route between metro stations
-                      var stationLayout = StationLayout();
-                      var route =
-                          stationLayout.pathBetween(startStation, destStation);
-                      for (int i = 0; i < route.length - 1; i++) {
-                        Color color = stationColors[route[i]] ??
-                            stationColors[route[i + 1]];
-                        MapDataState()
-                            .addRouteMarker(getStationMarker(route[i]));
-                        MapDataState().addCustomPolyline(Polyline(
-                            polylineId:
-                                PolylineId("${route[i]}+${route[i + 1]}"),
-                            color: color,
-                            points: [
-                              stationPositions[route[i]],
-                              stationPositions[route[i + 1]]
-                            ],
-                            width: POLYLINE_WIDTH,
-                            startCap: Cap.roundCap,
-                            endCap: Cap.roundCap));
-                      }
-                    }
-                  } catch (e) {
-                    showConnectionError(context as BuildContext);
-                  }
+                  LoadingWidget.of(context as BuildContext).startLoading();
+                  findRoute(context, source, destination)
+                      .then((value) => LoadingWidget.of(context).stopLoading());
                 },
                 style: const ButtonStyle(
                     backgroundColor:
