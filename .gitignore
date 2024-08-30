@@ -10,6 +10,8 @@
 .svn/
 migrate_working_dir/
 
+build
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -41,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# secrets
+secrets.dart

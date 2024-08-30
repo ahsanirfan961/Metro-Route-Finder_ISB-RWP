@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:metro_route_finder/Widgets/bottom_sheet.dart';
 import 'package:metro_route_finder/Widgets/loading.dart';
 import 'package:metro_route_finder/Widgets/map.dart';
-import 'package:metro_route_finder/functions.dart';
 import 'package:metro_route_finder/Widgets/nav_bar.dart';
 
 
@@ -17,9 +16,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () async {
-      locationPermission(context);
-    });
   }
 
   @override
