@@ -1,15 +1,59 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:metro_route_finder/Pages/home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key, required this.title});
 
   final String title;
 
+  Future<void> displayLocationUsageMsg(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? firstTime = prefs.getBool('first_time');
+
+    var duration = const Duration(milliseconds: 200);
+    print(firstTime);
+    if (firstTime == null || firstTime) {
+      prefs.setBool('first_time', false);
+      Timer(duration, () {
+        locationUsageMsg(context);
+      });
+    }
+  }
+
+  void locationUsageMsg(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Usage'),
+          content: const Text(
+              'This app may access your location, if you decide to navigate through your current location. Do you agree?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Agree'),
+            ),
+            TextButton(
+              onPressed: () {
+                exit(0);
+              },
+              child: const Text('Disagree'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    displayLocationUsageMsg(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -62,7 +106,6 @@ class WelcomePage extends StatelessWidget {
       ),
     );
   }
-
 
   Widget getStarted(BuildContext context) {
     return Container(

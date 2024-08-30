@@ -6,11 +6,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:metro_route_finder/Widgets/loading.dart';
-import 'package:metro_route_finder/const.dart';
 import 'package:metro_route_finder/Widgets/map.dart';
 import 'package:metro_route_finder/controllers/map_data.dart';
-import 'package:metro_route_finder/controllers/station.dart';
 import 'package:metro_route_finder/functions.dart';
+
+import '../secrets.dart';
 
 class MapLocation {
   String address = '';
@@ -191,7 +191,8 @@ class SearchBottomSheet extends StatelessWidget {
           googleAPIKey: GOOGLE_MAPS_API_KEY,
           inputDecoration: InputDecoration(
               enabledBorder: InputBorder.none,
-              hintText: 'Search Location',
+              focusedBorder: InputBorder.none,
+              labelText: 'Search Location',
               icon: const Icon(Icons.search_rounded),
               suffixIcon: Padding(
                 padding: const EdgeInsets.all(2.0),

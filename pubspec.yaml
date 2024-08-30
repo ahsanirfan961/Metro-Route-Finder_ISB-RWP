@@ -2,7 +2,7 @@ name: metro_route_finder
 description: "A new Flutter project."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 3.0.0+4
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -22,6 +22,7 @@ dependencies:
   flutter_polyline_points: ^2.0.0
   get: ^4.6.6
   connectivity_plus: ^5.0.2
+  shared_preferences: ^2.2.3
 
 
 dev_dependencies:
@@ -39,7 +40,6 @@ flutter:
   uses-material-design: true
   assets:
      - assets/images/
-     - windows/icon.ico
 
 
 

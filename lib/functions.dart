@@ -13,6 +13,8 @@ import 'package:metro_route_finder/controllers/map_data.dart';
 import 'package:metro_route_finder/controllers/station.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'secrets.dart';
+
 Future<LocationData> getCurrentLocation() async {
   final locationData = await location.getLocation();
   return locationData;
@@ -100,11 +102,13 @@ Future<List<LatLng>> getPolylineCoordinates(
   List<LatLng> coordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      GOOGLE_MAPS_API_KEY,
-      PointLatLng(source.latitude, source.longitude),
-      PointLatLng(destination.latitude, destination.longitude),
-      travelMode: TravelMode.driving,
-      optimizeWaypoints: true);
+    googleApiKey: GOOGLE_MAPS_API_KEY,
+    request: PolylineRequest(
+        origin: PointLatLng(source.latitude, source.longitude),
+        destination: PointLatLng(destination.latitude, destination.longitude),
+        mode: TravelMode.driving,
+        optimizeWaypoints: true),
+  );
   if (result.points.isNotEmpty) {
     result.points.forEach((element) {
       coordinates.add(LatLng(element.latitude, element.longitude));
@@ -183,80 +187,65 @@ void showConnectionError(BuildContext context) {
       });
 }
 
-Future<void> findRoute(BuildContext context, MapLocation source, MapLocation destination) async
-{
+Future<void> findRoute(
+    BuildContext context, MapLocation source, MapLocation destination) async {
   try {
-      if (source.position != null &&
-          destination.position != null) {
-        var startStation = getNearestStationTo(source.position!);
-        var destStation =
-            getNearestStationTo(destination.position!);
+    if (source.position != null && destination.position != null) {
+      var startStation = getNearestStationTo(source.position!);
+      var destStation = getNearestStationTo(destination.position!);
 
-        /*checking that if the distance between the source location 
+      /*checking that if the distance between the source location 
         and destination location is not actually less than the 
         distance that the traveller needs to cover to reach the 
         metro station*/
-        
-        var absDistance = calculateDistanceBetweenLocations(
-            await getPolylineCoordinates(
-                source.position!, destination.position!));
 
-        var metroDistance = calculateDistanceBetweenLocations(
-                await getPolylineCoordinates(source.position!,
-                    stationPositions[startStation])) +
-            calculateDistanceBetweenLocations(
-                await getPolylineCoordinates(
-                    destination.position!,
-                    stationPositions[destStation]));
+      var absDistance = calculateDistanceBetweenLocations(
+          await getPolylineCoordinates(
+              source.position!, destination.position!));
 
-        if (absDistance <= 0.5 * metroDistance) {
-          MapDataState().addPolyline('route', source.position!,
-              destination.position!, Colors.blue);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(
-                  content: Text(
-                      'No Metro Route exists between these locations!')));
-          return;
-        }
+      var metroDistance = calculateDistanceBetweenLocations(
+              await getPolylineCoordinates(
+                  source.position!, stationPositions[startStation])) +
+          calculateDistanceBetweenLocations(await getPolylineCoordinates(
+              destination.position!, stationPositions[destStation]));
 
-        // creating route to start station
-        MapDataState()
-            .addRouteMarker(getStationMarker(startStation));
-        MapDataState().addPolyline('source', source.position!,
-            stationPositions[startStation], Colors.blue);
-
-        // creating route to destination station
-        MapDataState()
-            .addRouteMarker(getStationMarker(destStation));
+      if (absDistance <= 0.5 * metroDistance) {
         MapDataState().addPolyline(
-            'destination',
-            destination.position!,
-            stationPositions[destStation],
-            Colors.blue);
-
-        // creating route between metro stations
-        var stationLayout = StationLayout();
-        var route =
-            stationLayout.pathBetween(startStation, destStation);
-        for (int i = 0; i < route.length - 1; i++) {
-          Color color = stationColors[route[i]] ??
-              stationColors[route[i + 1]];
-          MapDataState()
-              .addRouteMarker(getStationMarker(route[i]));
-          MapDataState().addCustomPolyline(Polyline(
-              polylineId:
-                  PolylineId("${route[i]}+${route[i + 1]}"),
-              color: color,
-              points: [
-                stationPositions[route[i]],
-                stationPositions[route[i + 1]]
-              ],
-              width: POLYLINE_WIDTH,
-              startCap: Cap.roundCap,
-              endCap: Cap.roundCap));
-        }
+            'route', source.position!, destination.position!, Colors.blue);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('No Metro Route exists between these locations!')));
+        return;
       }
-    } catch (e) {
-      showConnectionError(context);
+
+      // creating route to start station
+      MapDataState().addRouteMarker(getStationMarker(startStation));
+      MapDataState().addPolyline('source', source.position!,
+          stationPositions[startStation], Colors.blue);
+
+      // creating route to destination station
+      MapDataState().addRouteMarker(getStationMarker(destStation));
+      MapDataState().addPolyline('destination', destination.position!,
+          stationPositions[destStation], Colors.blue);
+
+      // creating route between metro stations
+      var stationLayout = StationLayout();
+      var route = stationLayout.pathBetween(startStation, destStation);
+      for (int i = 0; i < route.length - 1; i++) {
+        Color color = stationColors[route[i]] ?? stationColors[route[i + 1]];
+        MapDataState().addRouteMarker(getStationMarker(route[i]));
+        MapDataState().addCustomPolyline(Polyline(
+            polylineId: PolylineId("${route[i]}+${route[i + 1]}"),
+            color: color,
+            points: [
+              stationPositions[route[i]],
+              stationPositions[route[i + 1]]
+            ],
+            width: POLYLINE_WIDTH,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap));
+      }
     }
+  } catch (e) {
+    showConnectionError(context);
+  }
 }
