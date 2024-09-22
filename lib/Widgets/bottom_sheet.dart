@@ -189,38 +189,12 @@ class SearchBottomSheet extends StatelessWidget {
         child: GooglePlaceAutoCompleteTextField(
           textEditingController: searchController,
           googleAPIKey: GOOGLE_MAPS_API_KEY,
-          inputDecoration: InputDecoration(
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              labelText: 'Search Location',
-              icon: const Icon(Icons.search_rounded),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(100)),
-                    onTap: () async {
-                      try {
-                        if (await locationPermission(context)) {
-                          if (await gpsEnabled()) {
-                            var currentLocation = await getCurrentLocation();
-                            List<Placemark> placemarks =
-                                await placemarkFromCoordinates(
-                                    currentLocation.latitude!,
-                                    currentLocation.longitude!);
-                            searchLocation.position = LatLng(
-                                currentLocation.latitude!,
-                                currentLocation.longitude!);
-                            searchLocation.address =
-                                "${placemarks[0].street}, ${placemarks[0].subLocality}";
-                            Navigator.pop(context, searchLocation);
-                          }
-                        }
-                      } catch (e) {
-                        showConnectionError(context);
-                      }
-                    },
-                    child: const Icon(Icons.location_searching_rounded)),
-              )),
+          inputDecoration: const InputDecoration(
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            labelText: 'Search Location',
+            icon: Icon(Icons.search_rounded),
+          ),
           debounceTime: 800,
           isLatLngRequired: true,
           getPlaceDetailWithLatLng: (Prediction prediction) {

@@ -11,6 +11,7 @@ This is a state of the art application for finding the the routes for Metro bus 
   - Red and Orange metro lines available
   - All stations viewable
 - **22nd September 2024**: Refactor code for v1.0. Replaced some depracted classes and functions. All v1.0 features working and tested. Code is bug free.
+- **22nd September 2024**: Removed user location access feature due to policies of Google Play Store. Will try to re add this feature again after the Google approves the app's publication.
 
 
 ## Release Notes
