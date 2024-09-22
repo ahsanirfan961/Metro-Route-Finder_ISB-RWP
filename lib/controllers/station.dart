@@ -44,18 +44,6 @@ class StationLayout {
     }
   }
 
-  void printlayout() {
-    for (var i in stations.values) {
-      var current = i;
-      String llist = current.id + " >> ";
-      while (current.next != null) {
-        current = current.next!;
-        llist += current.id + " >> ";
-      }
-      print(llist);
-    }
-  }
-
   bool _dfs(String source, String destination, Map<String, bool> flags) {
     _route.add(source);
     flags[source] = true;

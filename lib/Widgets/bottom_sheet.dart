@@ -135,8 +135,8 @@ class _MainBottomSheetState extends State<MainBottomSheet>
                 },
                 style: const ButtonStyle(
                     backgroundColor:
-                        MaterialStatePropertyAll(Colors.deepOrangeAccent),
-                    elevation: MaterialStatePropertyAll(3)),
+                        WidgetStatePropertyAll(Colors.deepOrangeAccent),
+                    elevation: WidgetStatePropertyAll(3)),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(

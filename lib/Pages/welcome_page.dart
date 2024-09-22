@@ -15,7 +15,6 @@ class WelcomePage extends StatelessWidget {
     bool? firstTime = prefs.getBool('first_time');
 
     var duration = const Duration(milliseconds: 200);
-    print(firstTime);
     if (firstTime == null || firstTime) {
       prefs.setBool('first_time', false);
       Timer(duration, () {
