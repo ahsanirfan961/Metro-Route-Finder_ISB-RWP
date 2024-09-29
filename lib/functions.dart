@@ -5,63 +5,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:metro_route_finder/Widgets/bottom_sheet.dart';
 import 'package:metro_route_finder/Widgets/widget_to_map_icon.dart';
 import 'package:metro_route_finder/const.dart';
 import 'package:metro_route_finder/controllers/map_data.dart';
 import 'package:metro_route_finder/controllers/station.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'secrets.dart';
-
-Future<LocationData> getCurrentLocation() async {
-  final locationData = await location.getLocation();
-  return locationData;
-}
-
-Future<bool> gpsEnabled() async {
-  if (await location.serviceEnabled()) {
-    return true;
-  }
-  location.requestService();
-  return false;
-}
-
-Future<bool> locationPermission(BuildContext context) async {
-  const permission = Permission.location;
-  if (await permission.isDenied) {
-    permission.request();
-    return false;
-  } else if (await permission.isPermanentlyDenied) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Location Permisiion Required'),
-            content: const Text(
-                'Navigate to "Application Permissions" and allow location permissions'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  openAppSettings();
-                },
-                child: const Text('Open Settings'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Done'),
-              )
-            ],
-          );
-        });
-    return false;
-  } else {
-    return true;
-  }
-}
 
 Future<BitmapDescriptor> getCustomIcon(String imagePath) async {
   return SizedBox(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 
 const earthRadius = 6371; //km
 const Map stationPositions = {
@@ -72,7 +71,7 @@ const Map stationColors = {
   'Marir Chowk': Colors.red,
   'Saddar': Colors.red
 };
-Location location = Location();
+//Location location = Location();
 Set<Marker> stationMarkers = {};
 
 int POLYLINE_WIDTH = 6;
