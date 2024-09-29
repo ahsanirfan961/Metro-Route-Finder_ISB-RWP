@@ -2,7 +2,7 @@ name: metro_route_finder
 description: "A new Flutter project."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 4.0.0+6
+version: 4.0.0+7
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
