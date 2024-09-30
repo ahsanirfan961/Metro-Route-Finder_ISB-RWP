@@ -47,3 +47,4 @@ app.*.map.json
 
 # secrets
 secrets.dart
+android/app/src/main/AndroidManifest.xml
